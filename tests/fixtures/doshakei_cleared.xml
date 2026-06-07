@@ -9,4 +9,10 @@
       <jmx_ib:Text>土砂災害警戒情報を発表している地域はありません。</jmx_ib:Text>
     </jmx_ib:Headline>
   </jmx_ib:Head>
+  <Body>
+    <Item>
+      <Kind><Name>なし</Name><Code>0</Code><Status>なし</Status></Kind>
+      <Area><Name>筑前町</Name><Code>4044700</Code></Area>
+    </Item>
+  </Body>
 </Report>

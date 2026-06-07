@@ -69,3 +69,15 @@ def test_kirokuame_detected_by_head_title_only():
     now = dt.datetime(2026, 6, 7, 12, 40, tzinfo=dt.timezone(dt.timedelta(hours=9)))
     r = parse_kirokuame(_load("fuken_kiroku_titleonly.xml"), now=now)
     assert r["active"] is True
+
+
+def test_doshakei_real_data_only_warned_areas_active():
+    # 実 VXWW50（沖縄）: 国頭村/東村 が「警戒」、那覇市等は「なし」
+    body = _load("doshakei_real_okinawa.xml")
+    assert parse_doshakei(body, "4730100")["active"] is True   # 国頭村（警戒）
+    assert parse_doshakei(body, "4730300")["active"] is True   # 東村（警戒）
+    assert parse_doshakei(body, "4720100")["active"] is False  # 那覇市（なし）
+    # target_areas は警戒中のみ（県内全市町村ではない）
+    r = parse_doshakei(body, "4730100")
+    assert "国頭村" in r["target_areas"]
+    assert "那覇市" not in r["target_areas"]

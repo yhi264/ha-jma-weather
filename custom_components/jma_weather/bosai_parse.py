@@ -69,14 +69,50 @@ def _area_codes(root: Element) -> list[tuple[str, str]]:
 
 
 def parse_doshakei(xml_text: str, class20_code: str) -> dict[str, Any]:
-    """土砂災害警戒情報。対象 Area に class20 が含まれ取消でなければ active。"""
+    """土砂災害警戒情報。Kind/Name=="警戒" の Item の対象市町村に class20 が含まれ、
+    かつ取消でなければ active。
+
+    実 VXWW50 は県内全市町村を Item として列挙し、各 Item の Kind/Name で
+    警戒/なし/解除 を区別する（「Area に列挙＝警戒」ではない）。
+    """
     root = ET.fromstring(xml_text)
-    info_type = _find_text(root, "InfoType")
-    report_dt = _find_text(root, "ReportDateTime")
-    headline = _find_text(root, "Text")
-    areas = _area_codes(root)
-    target_codes = {c for _n, c in areas}
-    target_names = [n for n, _c in areas if n]
+    head = _find_head(root)
+    info_type = _find_text(head, "InfoType")
+    report_dt = _find_text(head, "ReportDateTime")
+    headline = _find_text(head, "Text")
+
+    warned: list[tuple[str, str]] = []
+    for item in _iter_local(root, "Item"):
+        # この Item の Kind/Name
+        kind_name = ""
+        for kind in _iter_local(item, "Kind"):
+            for c in kind.iter():
+                if _local(c.tag) == "Name" and c.text:
+                    kind_name = c.text.strip()
+                    break
+            break
+        if kind_name != "警戒":
+            continue
+        # この Item 配下の Area（Areas/Area でも Area 直下でも可）
+        for area in _iter_local(item, "Area"):
+            a_name = a_code = ""
+            for c in area:
+                ln = _local(c.tag)
+                if ln == "Name" and c.text:
+                    a_name = c.text.strip()
+                elif ln == "Code" and c.text:
+                    a_code = c.text.strip()
+            if a_code:
+                warned.append((a_name, a_code))
+
+    target_codes = {c for _n, c in warned}
+    seen: set[str] = set()
+    target_names: list[str] = []
+    for n, c in warned:
+        if n and c not in seen:
+            seen.add(c)
+            target_names.append(n)
+
     active = (info_type != "取消") and (class20_code in target_codes)
     return {
         "active": active,
