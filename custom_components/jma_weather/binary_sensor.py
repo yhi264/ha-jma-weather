@@ -9,7 +9,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from . import JmaConfigEntry
-from .const import CONF_CLASS20, DOMAIN, PHENOMENA
+from .const import CONF_CLASS20, DOMAIN, PHENOMENA, code_info
 from .device import jma_device_info
 
 _LEVEL_RANK = {"特別警報": 3, "警報": 2, "注意報": 1}
@@ -32,7 +32,7 @@ async def async_setup_entry(
 
 
 class JmaPhenomenonBinarySensor(CoordinatorEntity, BinarySensorEntity):
-    """1 現象 = 1 binary_sensor。"""
+    """1 現象 = 1 binary_sensor（共有警報コーディネーター参照）。"""
 
     _attr_has_entity_name = True
     _attr_device_class = BinarySensorDeviceClass.SAFETY
@@ -41,16 +41,16 @@ class JmaPhenomenonBinarySensor(CoordinatorEntity, BinarySensorEntity):
         super().__init__(entry.runtime_data.warning)
         self._codes = set(phenomenon["codes"])
         group = phenomenon["group"]
-        class20 = entry.data[CONF_CLASS20]
+        self._class20 = entry.data[CONF_CLASS20]
         self._attr_name = phenomenon["name"]
         self._attr_unique_id = f"{entry.entry_id}_{group}"
-        # 明示 entity_id（ASCII・安定・automation 参照しやすい）
-        self.entity_id = f"binary_sensor.{DOMAIN}_{class20}_{group}"
+        self.entity_id = f"binary_sensor.{DOMAIN}_{self._class20}_{group}"
         self._attr_entity_registry_enabled_default = phenomenon["enabled_default"]
         self._attr_device_info = jma_device_info(entry)
 
     def _active(self) -> list[dict]:
-        return [w for w in self.coordinator.data["warnings"] if w["code"] in self._codes]
+        d = (self.coordinator.data or {}).get(self._class20) or {"warnings": []}
+        return [w for w in d["warnings"] if w["code"] in self._codes]
 
     @property
     def is_on(self) -> bool:
@@ -60,9 +60,11 @@ class JmaPhenomenonBinarySensor(CoordinatorEntity, BinarySensorEntity):
     def extra_state_attributes(self) -> dict:
         active = self._active()
         if not active:
-            return {"level": "なし", "status": "なし"}
-        # 最上位レベルの警報を代表として属性に出す
-        top = max(active, key=lambda w: _LEVEL_RANK.get(w["level"], 0))
+            return {"level": None, "status": "なし"}
+        top = max(
+            active,
+            key=lambda w: ((w["level"] or 0), _LEVEL_RANK.get(code_info(w["code"])[1], 0)),
+        )
         return {"level": top["level"], "status": top["status"]}
 
 

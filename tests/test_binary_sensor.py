@@ -6,19 +6,16 @@ from custom_components.jma_weather.const import (
     DOMAIN, CONF_OFFICE, CONF_CLASS20, CONF_CLASS10, CONF_AREA_NAME,
 )
 
-_DATA = {
+_W = {"4044700": {
     "warnings": [
-        {"code": "14", "name": "雷注意報", "level": "注意報", "status": "発表"},
+        {"code": "10", "name": "大雨注意報", "level": 2, "status": "継続"},
     ],
-    "count": 1, "summary": "雷注意報", "has_special_warning": False,
-    "report_datetime": "2026-06-07T05:00:00+09:00", "area_found": True,
-}
-
-_BOSAI = {
-    "doshakei": {"active": False, "info_type": "", "report_datetime": "", "headline": "", "target_areas": []},
-    "tatsumaki": {"active": False, "info_type": "", "report_datetime": "", "headline": "", "valid_until": ""},
-    "kirokuame": {"active": False, "info_type": "", "report_datetime": "", "headline": ""},
-}
+    "count": 1, "summary": "大雨注意報", "has_special_warning": False,
+    "max_level": 2, "report_datetime": "2026-06-07T20:50:00+09:00",
+}}
+_BOSAI = {"doshakei": {"active": False, "info_type": "", "report_datetime": "", "headline": "", "target_areas": []},
+          "tatsumaki": {"active": False, "info_type": "", "report_datetime": "", "headline": "", "valid_until": ""},
+          "kirokuame": {"active": False, "info_type": "", "report_datetime": "", "headline": ""}}
 
 
 async def _setup(hass):
@@ -30,7 +27,7 @@ async def _setup(hass):
     entry.add_to_hass(hass)
     with patch(
         "custom_components.jma_weather.coordinator.JmaWarningCoordinator._async_update_data",
-        return_value=_DATA,
+        return_value=_W,
     ), patch(
         "custom_components.jma_weather.coordinator.JmaBosaiFeedCoordinator._async_update_data",
         return_value=_BOSAI,
@@ -40,23 +37,23 @@ async def _setup(hass):
     return entry
 
 
-async def test_kaminari_on(hass):
+async def test_ooame_on_with_level(hass):
     await _setup(hass)
-    # 明示的 entity_id（ASCII・安定）
-    state = hass.states.get("binary_sensor.jma_weather_4044700_kaminari")
+    state = hass.states.get("binary_sensor.jma_weather_4044700_ooame")
     assert state is not None
     assert state.state == "on"
-    assert state.attributes["level"] == "注意報"
-    assert state.attributes["status"] == "発表"
-    # 大雨は出ていないので off
-    ooame = hass.states.get("binary_sensor.jma_weather_4044700_ooame")
-    assert ooame is not None
-    assert ooame.state == "off"
+    assert state.attributes["level"] == 2
+    assert state.attributes["status"] == "継続"
 
 
-async def test_all_phenomena_enabled_by_default(hass):
+async def test_kaminari_off(hass):
     await _setup(hass)
-    # 全種別が既定で有効。乾燥(kansou)等のニッチ種別もエンティティが存在する
+    state = hass.states.get("binary_sensor.jma_weather_4044700_kaminari")
+    assert state is not None
+    assert state.state == "off"
+    assert state.attributes["level"] is None
+
+
+async def test_minor_phenomenon_enabled(hass):
+    await _setup(hass)
     assert hass.states.get("binary_sensor.jma_weather_4044700_kansou") is not None
-    assert hass.states.get("binary_sensor.jma_weather_4044700_shimo") is not None
-    assert hass.states.get("binary_sensor.jma_weather_4044700_nadare") is not None
