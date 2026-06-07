@@ -7,6 +7,11 @@ on:
     - cron: "0 0 * * *"
   workflow_dispatch:
 
+# 最小権限: 検証のみで書き込み不要。Action が侵害されても
+# GITHUB_TOKEN で push/release/comment できないようにする。
+permissions:
+  contents: read
+
 jobs:
   hassfest:
     name: hassfest
