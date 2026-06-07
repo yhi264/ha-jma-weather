@@ -1,0 +1,16 @@
+{
+  "config": {
+    "step": {
+      "office": {"title": "Select forecast region", "data": {"office_code": "Prefecture / region"}},
+      "municipality": {"title": "Select municipality", "data": {"class20_code": "Municipality"}},
+      "location": {"title": "Coordinates (for precipitation nowcast; defaults to HA home)", "data": {"latitude": "Latitude", "longitude": "Longitude"}}
+    },
+    "abort": {
+      "already_configured": "This municipality is already configured",
+      "cannot_connect": "Could not connect to JMA data"
+    }
+  },
+  "options": {
+    "step": {"init": {"title": "JMA Weather options", "data": {"scan_interval": "Update interval (seconds)"}}}
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "domain": "jma_weather",
+  "name": "JMA Weather (気象庁)",
+  "version": "0.1.0",
+  "config_flow": true,
+  "documentation": "https://github.com/yhi264/ha-jma-weather",
+  "issue_tracker": "https://github.com/yhi264/ha-jma-weather/issues",
+  "iot_class": "cloud_polling",
+  "integration_type": "service",
+  "codeowners": ["@yhi264"],
+  "requirements": [],
+  "dependencies": [],
+  "after_dependencies": []
+}

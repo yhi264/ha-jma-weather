@@ -1,0 +1,16 @@
+{
+  "config": {
+    "step": {
+      "office": {"title": "府県予報区を選択", "data": {"office_code": "都道府県/予報区"}},
+      "municipality": {"title": "市町村を選択", "data": {"class20_code": "市町村"}},
+      "location": {"title": "座標（降水ナウキャスト用・既定はHAホーム）", "data": {"latitude": "緯度", "longitude": "経度"}}
+    },
+    "abort": {
+      "already_configured": "この市町村は既に登録されています",
+      "cannot_connect": "気象庁データに接続できませんでした"
+    }
+  },
+  "options": {
+    "step": {"init": {"title": "JMA Weather オプション", "data": {"scan_interval": "更新間隔（秒）"}}}
+  }
+}
