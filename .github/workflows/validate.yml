@@ -23,3 +23,6 @@ jobs:
       - uses: hacs/action@main
         with:
           category: integration
+          # brands は home-assistant/brands 登録が必要でデフォルトストア用要件。
+          # カスタムリポジトリ導入には不要なため CI では無視（公開時に対応）。
+          ignore: brands
