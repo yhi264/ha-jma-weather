@@ -86,3 +86,15 @@ PHENOMENA: list[dict] = [
     {"group": "chakusetsu", "name": "着雪", "codes": ["26"], "enabled_default": False},
     {"group": "yuusetsu", "name": "融雪", "codes": ["17"], "enabled_default": False},
 ]
+
+# --- Phase 2b: 防災気象情報 ---
+BOSAI_FEED_URL = "https://www.data.jma.go.jp/developer/xml/feed/extra.xml"
+
+PRODUCT_DOSHA = "VXWW50"       # 土砂災害警戒情報
+PRODUCT_TATSUMAKI = "VPHW50"   # 竜巻注意情報
+PRODUCT_FUKEN = "VPFJ50"       # 府県気象情報（記録的短時間大雨情報を含む）
+BOSAI_PRODUCTS = (PRODUCT_DOSHA, PRODUCT_TATSUMAKI, PRODUCT_FUKEN)
+
+# 取消電文の無い瞬間情報の失効秒数
+TATSUMAKI_FALLBACK_VALID_SEC = 3600  # ValidDateTime 欠落時のフォールバック
+KIROKU_AME_VALID_SEC = 3600          # 記録的短時間大雨情報の自動失効

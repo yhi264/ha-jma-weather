@@ -1,1 +1,2 @@
 pytest-homeassistant-custom-component
+defusedxml>=0.7.1
