@@ -5,24 +5,14 @@ from homeassistant.components.binary_sensor import (
     BinarySensorDeviceClass, BinarySensorEntity,
 )
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from . import JmaConfigEntry
-from .const import CONF_AREA_NAME, CONF_CLASS20, DOMAIN, PHENOMENA
+from .const import CONF_CLASS20, DOMAIN, PHENOMENA
+from .device import jma_device_info
 
 _LEVEL_RANK = {"特別警報": 3, "警報": 2, "注意報": 1}
-
-
-def _jma_device_info(entry: JmaConfigEntry) -> DeviceInfo:
-    """地点ごとの共通 DeviceInfo。"""
-    return DeviceInfo(
-        identifiers={(DOMAIN, entry.entry_id)},
-        name=f"JMA {entry.data[CONF_AREA_NAME]}",
-        manufacturer="気象庁",
-        model="気象警報・注意報",
-    )
 
 
 # 防災情報3種の定義: (group, 表示名, coordinator data キー)
@@ -57,7 +47,7 @@ class JmaPhenomenonBinarySensor(CoordinatorEntity, BinarySensorEntity):
         # 明示 entity_id（ASCII・安定・automation 参照しやすい）
         self.entity_id = f"binary_sensor.{DOMAIN}_{class20}_{group}"
         self._attr_entity_registry_enabled_default = phenomenon["enabled_default"]
-        self._attr_device_info = _jma_device_info(entry)
+        self._attr_device_info = jma_device_info(entry)
 
     def _active(self) -> list[dict]:
         return [w for w in self.coordinator.data["warnings"] if w["code"] in self._codes]
@@ -89,7 +79,7 @@ class JmaBosaiBinarySensor(CoordinatorEntity, BinarySensorEntity):
         self._attr_name = name
         self._attr_unique_id = f"{entry.entry_id}_{group}"
         self.entity_id = f"binary_sensor.{DOMAIN}_{class20}_{group}"
-        self._attr_device_info = _jma_device_info(entry)
+        self._attr_device_info = jma_device_info(entry)
 
     @property
     def is_on(self) -> bool:
