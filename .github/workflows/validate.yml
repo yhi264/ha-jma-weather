@@ -7,10 +7,10 @@ on:
     - cron: "0 0 * * *"
   workflow_dispatch:
 
-# 最小権限: 検証のみで書き込み不要。Action が侵害されても
-# GITHUB_TOKEN で push/release/comment できないようにする。
-permissions:
-  contents: read
+# NOTE: 最小権限 permissions:{contents:read} を入れると、private リポジトリでは
+# hacs/action が GitHub API 経由で hacs.json/manifest.json を取得できず誤判定する。
+# public 化後に `permissions: contents: read` を追加してサプライチェーンを締める想定。
+# 代替の恒久ハードニングとして各 action の SHA ピン留めも検討可（README/ロードマップ参照）。
 
 jobs:
   hassfest:
