@@ -98,3 +98,7 @@ BOSAI_PRODUCTS = (PRODUCT_DOSHA, PRODUCT_TATSUMAKI, PRODUCT_FUKEN)
 # 取消電文の無い瞬間情報の失効秒数
 TATSUMAKI_FALLBACK_VALID_SEC = 3600  # ValidDateTime 欠落時のフォールバック
 KIROKU_AME_VALID_SEC = 3600          # 記録的短時間大雨情報の自動失効
+
+# --- Phase 2a-v2: 警報・注意報 R06 集約通報 ---
+WARNING_FEED_URL = "https://www.data.jma.go.jp/developer/xml/feed/regular.xml"
+PRODUCT_SHUYAKU = "VPWS50"  # 気象警報・注意報（R06）集約通報（全国・市町村粒度・レベル付き）
