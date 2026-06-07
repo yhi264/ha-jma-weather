@@ -19,7 +19,7 @@ It polls the official JMA disaster-prevention XML (R06 集約通報, VPWS50) and
 - 🚨 Emergency Warning (特別警報) detection
 - 📍 Multiple locations (add the integration once per location)
 - 🔁 Robust against JMA's "no warning" placeholder quirk; auto-recovers from fetch failures
-- 🌐 No external dependencies; uses Home Assistant's built-in HTTP client
+- 🌐 Minimal dependencies — Home Assistant's built-in HTTP client + `defusedxml` (safe XML parsing)
 
 ## Installation
 
@@ -43,7 +43,7 @@ Settings → Devices & Services → **Add Integration** → **JMA Weather**. The
 2. **Municipality** (市町村) — dropdown
 3. **Coordinates** — defaults to your Home Assistant home location; editable (saved for the Phase 2d precipitation nowcast)
 
-Options (changeable later): **update interval** in seconds (default `300` = 5 min, minimum `60`).
+Options (changeable later): **update interval** in seconds (default `300` = 5 min, minimum `60`). Note: the warning data source is a single nationwide document shared by one coordinator across all locations, so the warning poll interval is taken from the first-configured location; the per-location disaster-info poll honors each location's interval.
 
 ## Entities (one device per location)
 

@@ -12,7 +12,7 @@ from .const import LEVEL_SPECIAL, code_info
 _INACTIVE_STATUS = ("解除", "発表警報・注意報はなし", "")
 # 全角数字→半角
 _Z2H = str.maketrans("０１２３４５６７８９", "0123456789")
-_LEVEL_RE = re.compile(r"^レベル([0-9])(.+)$")
+_LEVEL_RE = re.compile(r"^レベル([1-5])(.+)$")  # 警戒レベルは 1〜5
 
 
 def _local(tag: str) -> str:

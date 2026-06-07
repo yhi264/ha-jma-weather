@@ -4,7 +4,7 @@ from __future__ import annotations
 import re
 from typing import Any
 
-from defusedxml import ElementTree as ET  # XXE/billion-laughs 対策。HA core 同梱
+from defusedxml import ElementTree as ET  # XXE/billion-laughs 対策。HA core 非同梱のため依存に明示済
 
 from .const import BOSAI_PRODUCTS
 

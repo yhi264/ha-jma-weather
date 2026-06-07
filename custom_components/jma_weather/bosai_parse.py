@@ -8,7 +8,7 @@ import datetime as dt
 from typing import Any
 from xml.etree.ElementTree import Element  # 型注釈のみ（パースには使わない）
 
-from defusedxml import ElementTree as ET  # 安全なパーサ（fromstring）。HA core 同梱
+from defusedxml import ElementTree as ET  # 安全なパーサ（fromstring）。HA core 非同梱のため依存に明示済
 
 from .const import KIROKU_AME_VALID_SEC, TATSUMAKI_FALLBACK_VALID_SEC
 
