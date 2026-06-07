@@ -1,70 +1,93 @@
 # ha-jma-weather
 
-気象庁（JMA）の防災情報から、指定地域の**気象警報・注意報・特別警報**を取得する Home Assistant カスタムインテグレーションです。
+**English** | [日本語](README.ja.md)
 
-公式 JSON（`warning/data/warning/{office}.json`）をポーリングし、地点ごとに「発表中の件数」を表す集約センサーと、現象ごとの `binary_sensor` を提供します。
+[![HACS Custom](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://hacs.xyz/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-> ステータス: **Phase 2a（警報・注意報）**。天気予報・降水ナウキャストは下記ロードマップ参照。
+A [Home Assistant](https://www.home-assistant.io/) custom integration that exposes **weather warnings, advisories, and emergency warnings** issued by the **Japan Meteorological Agency (JMA / 気象庁)** for any municipality in Japan.
 
-## インストール
+It polls the official JMA open data (`warning/data/warning/{office}.json`) and creates, per location, an aggregate sensor (number of active warnings) plus one `binary_sensor` per phenomenon (thunderstorm, heavy rain, flood, …).
 
-### HACS（カスタムリポジトリ）
-1. HACS → 統合 → 右上メニュー → カスタムリポジトリ
-2. リポジトリに `https://github.com/yhi264/ha-jma-weather`、種別「Integration」を追加
-3. 「JMA Weather」をインストール → Home Assistant を再起動
+> **Status: Phase 2a (warnings & advisories).** Weather forecast and precipitation nowcast are on the roadmap below.
 
-### 手動
-`custom_components/jma_weather/` を HA の `config/custom_components/` に配置して再起動。
+## Features
 
-## 設定（UI）
+- 🗾 Pick any municipality in Japan from a UI dropdown — no manual codes
+- ⚡ One `binary_sensor` per phenomenon (`on` while issued/continuing) — easy automations
+- 📊 Aggregate sensor with the full active-warning list in attributes
+- 🚨 Emergency Warning (特別警報) detection
+- 📍 Multiple locations (add the integration once per location)
+- 🔁 Robust against JMA's "no warning" placeholder quirk; auto-recovers from fetch failures
+- 🌐 No external dependencies; uses Home Assistant's built-in HTTP client
 
-設定 → デバイスとサービス → 統合を追加 → 「JMA Weather」。`area.json` を取得し、以下をウィザードで選択します（手入力不要）:
+## Installation
 
-1. **府県予報区**（都道府県／予報区）をドロップダウンから選択
-2. **市町村**を選択
-3. **座標**を確認（既定は HA のホーム座標。任意の地点へ変更可。Phase 2d の降水ナウキャスト用に保存）
+### HACS (custom repository)
 
-オプション（後から変更可）: **更新間隔（秒）**（既定 300＝5分、最小 60）。
+1. HACS → Integrations → ⋮ (top-right) → **Custom repositories**
+2. Add `https://github.com/yhi264/ha-jma-weather` with category **Integration**
+3. Install **JMA Weather**, then restart Home Assistant
 
-## エンティティ（地点ごとに 1 デバイス）
+> Once this repository is published to the HACS default store, the custom-repository step will no longer be necessary.
 
-### 集約センサー
-- **`sensor.jma_weather_<class20>_warnings`** — 発表中の警報・注意報の**件数**（int）
-  - 属性: `summary`（例「雷注意報・大雨警報」/「なし」）、`warnings`（`{code,name,level,status}` のリスト）、`has_special_warning`、`report_datetime`、`area_name`
-  - 例: `sensor.jma_weather_4044700_warnings`
+### Manual
 
-### 現象ごと binary_sensor
-- **`binary_sensor.jma_weather_<class20>_<group>`** — その現象が**発表中または継続中**なら `on`（`device_class: safety`）
-  - 属性: `level`（特別警報／警報／注意報）、`status`（発表／継続／なし）。1 現象が注意報〜特別警報の複数レベルを束ね、`level` に最上位を表示
-  - 例: `binary_sensor.jma_weather_4044700_kaminari`
+Copy `custom_components/jma_weather/` into your Home Assistant `config/custom_components/` directory and restart.
 
-#### 既定で有効な現象（group）
-| group | 現象 | 含むコード |
+## Configuration
+
+Settings → Devices & Services → **Add Integration** → **JMA Weather**. The setup wizard fetches `area.json` and walks you through:
+
+1. **Forecast region** (prefecture / 府県予報区) — dropdown
+2. **Municipality** (市町村) — dropdown
+3. **Coordinates** — defaults to your Home Assistant home location; editable (saved for the Phase 2d precipitation nowcast)
+
+Options (changeable later): **update interval** in seconds (default `300` = 5 min, minimum `60`).
+
+## Entities (one device per location)
+
+### Aggregate sensor
+
+- **`sensor.jma_weather_<class20>_warnings`** — number of active warnings/advisories (int)
+  - Attributes: `summary` (e.g. `雷注意報・大雨警報` / `なし`), `warnings` (list of `{code, name, level, status}`), `has_special_warning`, `report_datetime`, `area_name`
+  - Example: `sensor.jma_weather_4044700_warnings`
+
+### Per-phenomenon binary sensors
+
+- **`binary_sensor.jma_weather_<class20>_<group>`** — `on` while that phenomenon is **issued (発表) or continuing (継続)** (`device_class: safety`)
+  - Attributes: `level` (Emergency Warning / Warning / Advisory), `status`. A single phenomenon spans advisory→warning→emergency levels; `level` reflects the highest active one.
+  - Example: `binary_sensor.jma_weather_4044700_kaminari`
+
+#### Enabled by default
+
+| group | Phenomenon | JMA codes |
 |---|---|---|
-| `kaminari` | 雷 | 14 |
-| `ooame` | 大雨 | 10 / 03 / 33 |
-| `kozui` | 洪水 | 18 / 04 |
-| `boufuu` | 暴風 | 05 / 35 |
-| `boufuusetsu` | 暴風雪 | 02 / 32 |
-| `ooyuki` | 大雪 | 12 / 06 / 36 |
-| `nami` | 波浪 | 16 / 07 / 37 |
-| `takashio` | 高潮 | 19 / 08 / 38 |
-| `kyoufuu` | 強風 | 15 |
-| `noumu` | 濃霧 | 20 |
-| `tokubetsu` | 特別警報（いずれか）集約 | 32 / 33 / 35 / 36 / 37 / 38 |
+| `kaminari` | Thunderstorm / 雷 | 14 |
+| `ooame` | Heavy rain / 大雨 | 10 / 03 / 33 |
+| `kozui` | Flood / 洪水 | 18 / 04 |
+| `boufuu` | Gale / 暴風 | 05 / 35 |
+| `boufuusetsu` | Snowstorm / 暴風雪 | 02 / 32 |
+| `ooyuki` | Heavy snow / 大雪 | 12 / 06 / 36 |
+| `nami` | High waves / 波浪 | 16 / 07 / 37 |
+| `takashio` | Storm surge / 高潮 | 19 / 08 / 38 |
+| `kyoufuu` | Strong wind / 強風 | 15 |
+| `noumu` | Dense fog / 濃霧 | 20 |
+| `tokubetsu` | Emergency Warning (any) / 特別警報 | 32 / 33 / 35 / 36 / 37 / 38 |
 
-#### 既定で無効な現象（必要なら HA のエンティティ設定で有効化）
-`fuusetsu`（風雪）/ `kansou`（乾燥）/ `nadare`（なだれ）/ `teion`（低温）/ `shimo`（霜）/ `chakuhyou`（着氷）/ `chakusetsu`（着雪）/ `yuusetsu`（融雪）
+#### Disabled by default (enable in the entity settings as needed)
 
-## 複数地点
+`fuusetsu` (snow & wind / 風雪), `kansou` (dry air / 乾燥), `nadare` (avalanche / なだれ), `teion` (low temperature / 低温), `shimo` (frost / 霜), `chakuhyou` (icing / 着氷), `chakusetsu` (snow accretion / 着雪), `yuusetsu` (snowmelt / 融雪)
 
-統合を地点ごとに複数追加します（1 エントリー = 1 地点）。同一府県内の別地点も独立エントリーとして登録でき、エンティティ・デバイスは衝突しません（市町村コードで一意化）。
+## Multiple locations
 
-## オートメーション例
+Add the integration once per location (1 config entry = 1 location). Locations in the same prefecture register as independent entries; entities and devices never collide (keyed by municipality code).
+
+## Automation example
 
 ```yaml
 automation:
-  - alias: 雷注意報が出たら通知
+  - alias: Notify on thunderstorm advisory
     trigger:
       - platform: state
         entity_id: binary_sensor.jma_weather_4044700_kaminari
@@ -72,20 +95,20 @@ automation:
     action:
       - service: notify.mobile_app
         data:
-          message: "筑前町に雷注意報が発表されました"
+          message: "A thunderstorm advisory has been issued for your area."
 ```
 
-## データ出典
+## Data source & disclaimer
 
-気象庁 防災情報（`https://www.jma.go.jp/bosai/`）。本ソフトは気象庁の提供物ではありません。
+Data: Japan Meteorological Agency disaster-prevention information (`https://www.jma.go.jp/bosai/`). This project is not affiliated with or endorsed by the JMA.
 
-## ロードマップ
+## Roadmap
 
-- **Phase 2b:** 防災気象情報（土砂災害警戒情報・記録的短時間大雨情報・竜巻注意情報）
-- **Phase 2c:** 天気予報・気温・降水確率 → HA `weather` エンティティ
-- **Phase 2d:** 降水ナウキャスト「あと○分で雨／止む」（タイルサンプリング）
+- **Phase 2b:** Disaster-prevention info (landslide / record short-time heavy rain / tornado advisories)
+- **Phase 2c:** Weather forecast, temperature, precipitation probability → Home Assistant `weather` entity
+- **Phase 2d:** Precipitation nowcast — "rain starts/stops in N minutes" (tile sampling)
 
-## 開発
+## Development
 
 ```bash
 python3 -m venv .venv
@@ -93,8 +116,8 @@ python3 -m venv .venv
 ./.venv/bin/pytest tests/ -q
 ```
 
-設計ドキュメントは `docs/superpowers/` 配下（spec / 実装計画）。
+Design documents live under `docs/superpowers/` (spec & implementation plan).
 
-## ライセンス
+## License
 
 MIT License © 2026 yhi264
