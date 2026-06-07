@@ -9,7 +9,7 @@ A [Home Assistant](https://www.home-assistant.io/) custom integration that expos
 
 It polls the official JMA open data (`warning/data/warning/{office}.json`) and creates, per location, an aggregate sensor (number of active warnings) plus one `binary_sensor` per phenomenon (thunderstorm, heavy rain, flood, …).
 
-> **Status: Phase 2a (warnings & advisories).** Weather forecast and precipitation nowcast are on the roadmap below.
+> **Status: Phase 2b (warnings/advisories + disaster-prevention info).** Weather forecast and precipitation nowcast are on the roadmap below.
 
 ## Features
 
