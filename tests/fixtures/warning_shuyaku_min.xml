@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Report xmlns="http://xml.kishou.go.jp/jmaxml1/" xmlns:jmx_ib="http://xml.kishou.go.jp/jmaxml1/informationBasis1/">
+  <Control><Title>気象警報・注意報（Ｒ０６）（集約通報）</Title><Status>通常</Status></Control>
+  <jmx_ib:Head>
+    <jmx_ib:Title>警戒・注意事項集約定時通報</jmx_ib:Title>
+    <jmx_ib:ReportDateTime>2026-06-07T20:50:00+09:00</jmx_ib:ReportDateTime>
+    <jmx_ib:InfoType>発表</jmx_ib:InfoType>
+  </jmx_ib:Head>
+  <Body xmlns="http://xml.kishou.go.jp/jmaxml1/body/meteorology1/">
+    <Warning type="気象警報・注意報（市町村等）">
+      <Item>
+        <Kind><Name>レベル２大雨注意報</Name><Code>10</Code><Status>継続</Status></Kind>
+        <Kind><Name>雷注意報</Name><Code>14</Code><Status>発表</Status></Kind>
+        <Area><Name>筑前町</Name><Code>4044700</Code></Area>
+      </Item>
+      <Item>
+        <Kind><Name>波浪注意報</Name><Code>16</Code><Status>発表</Status></Kind>
+        <Area><Name>別府市</Name><Code>4420200</Code></Area>
+      </Item>
+      <Item>
+        <Kind><Name>発表警報・注意報はなし</Name><Status>発表警報・注意報はなし</Status></Kind>
+        <Area><Name>那覇市</Name><Code>4720100</Code></Area>
+      </Item>
+      <Item>
+        <Kind><Name>レベル５大雨特別警報</Name><Code>33</Code><Status>発表</Status></Kind>
+        <Area><Name>テスト市</Name><Code>9999999</Code></Area>
+      </Item>
+    </Warning>
+  </Body>
+</Report>
