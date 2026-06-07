@@ -79,6 +79,16 @@
 
 `fuusetsu`（風雪）/ `kansou`（乾燥）/ `nadare`（なだれ）/ `teion`（低温）/ `shimo`（霜）/ `chakuhyou`（着氷）/ `chakusetsu`（着雪）/ `yuusetsu`（融雪）
 
+#### 防災気象情報（Phase 2b・既定で有効）
+
+| entity_id suffix | 情報 |
+|---|---|
+| `doshakei` | 土砂災害警戒情報（市町村単位） |
+| `tatsumaki` | 竜巻注意情報（府県単位・約1時間有効） |
+| `kirokuame` | 記録的短時間大雨情報（府県単位） |
+
+属性: `info_type` / `report_datetime` / `headline`、竜巻は `valid_until`、土砂は `target_areas`。
+
 ## 複数地点
 
 統合を地点ごとに複数追加します（1 エントリー = 1 地点）。同一府県内の別地点も独立エントリーとして登録でき、エンティティ・デバイスは衝突しません（市町村コードで一意化）。
@@ -104,7 +114,6 @@ automation:
 
 ## ロードマップ
 
-- **Phase 2b:** 防災気象情報（土砂災害警戒情報・記録的短時間大雨情報・竜巻注意情報）
 - **Phase 2c:** 天気予報・気温・降水確率 → HA `weather` エンティティ
 - **Phase 2d:** 降水ナウキャスト「あと○分で雨／止む」（タイルサンプリング）
 

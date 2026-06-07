@@ -79,6 +79,16 @@ Options (changeable later): **update interval** in seconds (default `300` = 5 mi
 
 `fuusetsu` (snow & wind / 風雪), `kansou` (dry air / 乾燥), `nadare` (avalanche / なだれ), `teion` (low temperature / 低温), `shimo` (frost / 霜), `chakuhyou` (icing / 着氷), `chakusetsu` (snow accretion / 着雪), `yuusetsu` (snowmelt / 融雪)
 
+#### Disaster-prevention info (Phase 2b, enabled by default)
+
+| entity_id suffix | Information |
+|---|---|
+| `doshakei` | Landslide warning (土砂災害警戒情報) — municipality-level |
+| `tatsumaki` | Tornado advisory (竜巻注意情報) — prefecture-level, ~1h validity |
+| `kirokuame` | Record short-time heavy rain (記録的短時間大雨情報) — prefecture-level |
+
+Attributes: `info_type`, `report_datetime`, `headline`, plus `valid_until` (tornado) and `target_areas` (landslide).
+
 ## Multiple locations
 
 Add the integration once per location (1 config entry = 1 location). Locations in the same prefecture register as independent entries; entities and devices never collide (keyed by municipality code).
@@ -104,7 +114,6 @@ Data: Japan Meteorological Agency disaster-prevention information (`https://www.
 
 ## Roadmap
 
-- **Phase 2b:** Disaster-prevention info (landslide / record short-time heavy rain / tornado advisories)
 - **Phase 2c:** Weather forecast, temperature, precipitation probability → Home Assistant `weather` entity
 - **Phase 2d:** Precipitation nowcast — "rain starts/stops in N minutes" (tile sampling)
 
