@@ -14,6 +14,12 @@ _DATA = {
     "report_datetime": "2026-06-07T05:00:00+09:00", "area_found": True,
 }
 
+_BOSAI = {
+    "doshakei": {"active": False, "info_type": "", "report_datetime": "", "headline": "", "target_areas": []},
+    "tatsumaki": {"active": False, "info_type": "", "report_datetime": "", "headline": "", "valid_until": ""},
+    "kirokuame": {"active": False, "info_type": "", "report_datetime": "", "headline": ""},
+}
+
 
 async def _setup(hass):
     entry = MockConfigEntry(
@@ -25,6 +31,9 @@ async def _setup(hass):
     with patch(
         "custom_components.jma_weather.coordinator.JmaWarningCoordinator._async_update_data",
         return_value=_DATA,
+    ), patch(
+        "custom_components.jma_weather.coordinator.JmaBosaiFeedCoordinator._async_update_data",
+        return_value=_BOSAI,
     ):
         await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()

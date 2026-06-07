@@ -25,6 +25,11 @@ async def test_setup_and_unload(hass):
     )
     entry.add_to_hass(hass)
 
+    _BOSAI = {
+        "doshakei": {"active": False, "info_type": "", "report_datetime": "", "headline": "", "target_areas": []},
+        "tatsumaki": {"active": False, "info_type": "", "report_datetime": "", "headline": "", "valid_until": ""},
+        "kirokuame": {"active": False, "info_type": "", "report_datetime": "", "headline": ""},
+    }
     with patch(
         "custom_components.jma_weather.coordinator.JmaWarningCoordinator._async_update_data",
         return_value={
@@ -32,6 +37,9 @@ async def test_setup_and_unload(hass):
             "count": 1, "summary": "雷注意報", "has_special_warning": False,
             "report_datetime": "2026-06-07T05:00:00+09:00", "area_found": True,
         },
+    ), patch(
+        "custom_components.jma_weather.coordinator.JmaBosaiFeedCoordinator._async_update_data",
+        return_value=_BOSAI,
     ):
         assert await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()
