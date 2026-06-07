@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Report xmlns="http://xml.kishou.go.jp/jmaxml1/" xmlns:jmx_ib="http://xml.kishou.go.jp/jmaxml1/informationBasis1/">
+  <Control><Title>府県気象情報</Title></Control>
+  <jmx_ib:Head>
+    <jmx_ib:Title>福岡県気象情報</jmx_ib:Title>
+    <jmx_ib:ReportDateTime>2026-06-07T12:00:00+09:00</jmx_ib:ReportDateTime>
+    <jmx_ib:InfoType>発表</jmx_ib:InfoType>
+    <jmx_ib:Headline>
+      <jmx_ib:Text>これまでの雨により地盤が緩んでいる所があります。</jmx_ib:Text>
+    </jmx_ib:Headline>
+  </jmx_ib:Head>
+</Report>

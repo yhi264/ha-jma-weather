@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Report xmlns="http://xml.kishou.go.jp/jmaxml1/" xmlns:jmx_ib="http://xml.kishou.go.jp/jmaxml1/informationBasis1/">
+  <Control><Title>竜巻注意情報</Title></Control>
+  <jmx_ib:Head>
+    <jmx_ib:Title>竜巻注意情報</jmx_ib:Title>
+    <jmx_ib:ReportDateTime>2026-06-07T12:25:00+09:00</jmx_ib:ReportDateTime>
+    <jmx_ib:InfoType>発表</jmx_ib:InfoType>
+    <jmx_ib:InfoKind>竜巻注意情報</jmx_ib:InfoKind>
+    <jmx_ib:Headline>
+      <jmx_ib:Text>福岡県では竜巻などの激しい突風に注意してください。</jmx_ib:Text>
+      <jmx_ib:Information type="気象警報・注意報（細分区域等）">
+        <jmx_ib:Item>
+          <jmx_ib:Kind><jmx_ib:Name>竜巻注意情報</jmx_ib:Name></jmx_ib:Kind>
+          <jmx_ib:Areas codeType="気象情報／府県予報区等">
+            <jmx_ib:Area><jmx_ib:Name>福岡県</jmx_ib:Name><jmx_ib:Code>400000</jmx_ib:Code></jmx_ib:Area>
+          </jmx_ib:Areas>
+        </jmx_ib:Item>
+      </jmx_ib:Information>
+    </jmx_ib:Headline>
+    <jmx_ib:ValidDateTime>2026-06-07T13:25:00+09:00</jmx_ib:ValidDateTime>
+  </jmx_ib:Head>
+</Report>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Report xmlns="http://xml.kishou.go.jp/jmaxml1/" xmlns:jmx_ib="http://xml.kishou.go.jp/jmaxml1/informationBasis1/">
+  <Control><Title>土砂災害警戒情報</Title></Control>
+  <jmx_ib:Head>
+    <jmx_ib:Title>土砂災害警戒情報</jmx_ib:Title>
+    <jmx_ib:ReportDateTime>2026-06-07T12:30:00+09:00</jmx_ib:ReportDateTime>
+    <jmx_ib:InfoType>発表</jmx_ib:InfoType>
+    <jmx_ib:Headline>
+      <jmx_ib:Text>福岡県土砂災害警戒情報</jmx_ib:Text>
+      <jmx_ib:Information type="土砂災害警戒情報（市町村等）">
+        <jmx_ib:Item>
+          <jmx_ib:Areas codeType="市町村等">
+            <jmx_ib:Area><jmx_ib:Name>筑前町</jmx_ib:Name><jmx_ib:Code>4044700</jmx_ib:Code></jmx_ib:Area>
+            <jmx_ib:Area><jmx_ib:Name>朝倉市</jmx_ib:Name><jmx_ib:Code>4022800</jmx_ib:Code></jmx_ib:Area>
+          </jmx_ib:Areas>
+        </jmx_ib:Item>
+      </jmx_ib:Information>
+    </jmx_ib:Headline>
+  </jmx_ib:Head>
+</Report>
