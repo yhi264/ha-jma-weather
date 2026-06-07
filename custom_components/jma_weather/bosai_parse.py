@@ -1,0 +1,128 @@
+"""防災情報の詳細XML(JMX)解析（HA 非依存の純ロジック）。
+
+JMX は名前空間付きだが、製品ごとに異なるため、要素はローカル名で走査する。
+"""
+from __future__ import annotations
+
+import datetime as dt
+from typing import Any
+from xml.etree.ElementTree import Element  # 型注釈のみ（パースには使わない）
+
+from defusedxml import ElementTree as ET  # 安全なパーサ（fromstring）。HA core 同梱
+
+from .const import KIROKU_AME_VALID_SEC, TATSUMAKI_FALLBACK_VALID_SEC
+
+
+def _local(tag: str) -> str:
+    """名前空間付きタグからローカル名を取り出す。"""
+    return tag.rsplit("}", 1)[-1]
+
+
+def _find_text(root: Element, localname: str) -> str:
+    """最初に一致するローカル名要素のテキストを返す（深さ優先・全走査）。"""
+    for el in root.iter():
+        if _local(el.tag) == localname and el.text:
+            return el.text.strip()
+    return ""
+
+
+def _iter_local(root: Element, localname: str):
+    for el in root.iter():
+        if _local(el.tag) == localname:
+            yield el
+
+
+def _parse_dt(s: str) -> dt.datetime | None:
+    s = s.strip()
+    if not s:
+        return None
+    try:
+        return dt.datetime.fromisoformat(s)
+    except ValueError:
+        return None
+
+
+def _area_codes(root: Element) -> list[tuple[str, str]]:
+    """全 Area 要素の (name, code) を返す。"""
+    out: list[tuple[str, str]] = []
+    for area in _iter_local(root, "Area"):
+        name = ""
+        code = ""
+        for child in area:
+            ln = _local(child.tag)
+            if ln == "Name" and child.text:
+                name = child.text.strip()
+            elif ln == "Code" and child.text:
+                code = child.text.strip()
+        if code:
+            out.append((name, code))
+    return out
+
+
+def parse_doshakei(xml_text: str, class20_code: str) -> dict[str, Any]:
+    """土砂災害警戒情報。対象 Area に class20 が含まれ取消でなければ active。"""
+    root = ET.fromstring(xml_text)
+    info_type = _find_text(root, "InfoType")
+    report_dt = _find_text(root, "ReportDateTime")
+    headline = _find_text(root, "Text")
+    areas = _area_codes(root)
+    target_codes = {c for _n, c in areas}
+    target_names = [n for n, _c in areas if n]
+    active = (info_type != "取消") and (class20_code in target_codes)
+    return {
+        "active": active,
+        "info_type": info_type,
+        "report_datetime": report_dt,
+        "headline": headline,
+        "target_areas": target_names,
+    }
+
+
+def parse_tatsumaki(
+    xml_text: str, office_code: str, now: dt.datetime
+) -> dict[str, Any]:
+    """竜巻注意情報。発表かつ ValidDateTime 未経過なら active。"""
+    root = ET.fromstring(xml_text)
+    info_type = _find_text(root, "InfoType")
+    report_dt = _find_text(root, "ReportDateTime")
+    headline = _find_text(root, "Text")
+    valid_s = _find_text(root, "ValidDateTime")
+    valid = _parse_dt(valid_s)
+    if valid is None:
+        rep = _parse_dt(report_dt)
+        if rep is not None:
+            valid = rep + dt.timedelta(seconds=TATSUMAKI_FALLBACK_VALID_SEC)
+    active = (info_type == "発表") and (valid is not None) and (now < valid)
+    return {
+        "active": active,
+        "info_type": info_type,
+        "report_datetime": report_dt,
+        "valid_until": valid.isoformat() if valid else "",
+        "headline": headline,
+    }
+
+
+def parse_kirokuame(xml_text: str, now: dt.datetime) -> dict[str, Any]:
+    """記録的短時間大雨情報（府県気象情報のうち見出しに該当語を含むもの）。
+
+    取消電文が無いため ReportDateTime から KIROKU_AME_VALID_SEC 以内なら active。
+    """
+    root = ET.fromstring(xml_text)
+    info_type = _find_text(root, "InfoType")
+    title = _find_text(root, "Title")
+    headline = _find_text(root, "Text")
+    report_dt = _find_text(root, "ReportDateTime")
+    is_kiroku = ("記録的短時間大雨" in title) or ("記録的短時間大雨" in headline)
+    rep = _parse_dt(report_dt)
+    within = (
+        rep is not None
+        and now >= rep
+        and (now - rep).total_seconds() <= KIROKU_AME_VALID_SEC
+    )
+    active = is_kiroku and (info_type != "取消") and within
+    return {
+        "active": active,
+        "info_type": info_type,
+        "report_datetime": report_dt,
+        "headline": headline if is_kiroku else "",
+    }
