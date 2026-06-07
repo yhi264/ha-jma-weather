@@ -17,54 +17,54 @@ from .const import (
     DOMAIN,
     PRODUCT_DOSHA,
     PRODUCT_FUKEN,
+    PRODUCT_SHUYAKU,
     PRODUCT_TATSUMAKI,
+    WARNING_FEED_URL,
 )
-from .jma_parse import parse_warnings
+from .warning_r06 import parse_warnings_r06
 
 _LOGGER = logging.getLogger(__name__)
 
-WARNING_URL = "https://www.jma.go.jp/bosai/warning/data/warning/{office}.json"
+class JmaWarningCoordinator(DataUpdateCoordinator[dict[str, dict]]):
+    """HAに1つの共有コーディネーター。VPWS50(全国)を1回取得し登録class20のみパース。"""
 
-
-class JmaWarningCoordinator(DataUpdateCoordinator[dict[str, Any]]):
-    """1 地点ぶんの警報を取得・パースする coordinator。"""
-
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        session: aiohttp.ClientSession,
-        office_code: str,
-        class20_code: str,
-        scan_interval: int,
-    ) -> None:
+    def __init__(self, hass: HomeAssistant, session, scan_interval: int) -> None:
         super().__init__(
-            hass,
-            _LOGGER,
-            name=f"{DOMAIN}_{class20_code}",
+            hass, _LOGGER, name=f"{DOMAIN}_warning",
             update_interval=timedelta(seconds=scan_interval),
         )
         self._session = session
-        self._office_code = office_code  # 将来 office 共有 coordinator 化の布石
-        self._class20_code = class20_code
+        self._areas: set[str] = set()
 
-    async def _async_update_data(self) -> dict[str, Any]:
-        url = WARNING_URL.format(office=self._office_code)
+    def register_area(self, class20_code: str) -> None:
+        self._areas.add(class20_code)
+
+    def unregister_area(self, class20_code: str) -> None:
+        self._areas.discard(class20_code)
+
+    def has_areas(self) -> bool:
+        return bool(self._areas)
+
+    async def _fetch_text(self, url: str) -> str:
+        async with self._session.get(
+            url, timeout=aiohttp.ClientTimeout(total=60)
+        ) as resp:
+            resp.raise_for_status()
+            return await resp.text()
+
+    async def _async_update_data(self) -> dict[str, dict]:
         try:
-            async with self._session.get(
-                url, timeout=aiohttp.ClientTimeout(total=30)
-            ) as resp:
-                resp.raise_for_status()
-                payload = await resp.json()
+            feed = await self._fetch_text(WARNING_FEED_URL)
+            entries = [e for e in parse_feed(feed) if e["product"] == PRODUCT_SHUYAKU]
+            if not entries:
+                raise UpdateFailed("VPWS50 not found in regular feed")
+            latest = max(entries, key=lambda e: e["updated"])
+            xml_text = await self._fetch_text(latest["url"])
+        except UpdateFailed:
+            raise
         except Exception as err:  # noqa: BLE001
-            raise UpdateFailed(f"JMA warning fetch failed: {err}") from err
-
-        result = parse_warnings(payload, self._class20_code)
-        if not result.get("area_found", True):
-            _LOGGER.warning(
-                "市町村コード %s が %s.json に見つかりません",
-                self._class20_code, self._office_code,
-            )
-        return result
+            raise UpdateFailed(f"JMA warning(R06) fetch failed: {err}") from err
+        return parse_warnings_r06(xml_text, set(self._areas))
 
 
 class JmaBosaiFeedCoordinator(DataUpdateCoordinator[dict[str, Any]]):
