@@ -15,19 +15,18 @@ from .area import fetch_area, list_municipalities, list_offices, resolve_class10
 from .const import (
     CONF_AREA_NAME, CONF_CLASS10, CONF_CLASS20, CONF_LATITUDE, CONF_LONGITUDE,
     CONF_OFFICE, CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL, DOMAIN,
+    WARNING_FEED_URL,
 )
-from .coordinator import WARNING_URL
 
 
-async def _test_warning(session: aiohttp.ClientSession, office_code: str) -> bool:
-    """warning.json の到達性を検証。"""
+async def _test_warning(session: aiohttp.ClientSession) -> bool:
+    """警報データ源（regular.xml）の到達性を検証。"""
     try:
         async with session.get(
-            WARNING_URL.format(office=office_code),
-            timeout=aiohttp.ClientTimeout(total=30),
+            WARNING_FEED_URL, timeout=aiohttp.ClientTimeout(total=30)
         ) as resp:
             resp.raise_for_status()
-            await resp.json()
+            await resp.text()
         return True
     except Exception:  # noqa: BLE001
         return False
@@ -72,7 +71,7 @@ class JmaConfigFlow(ConfigFlow, domain=DOMAIN):
             await self.async_set_unique_id(self._class20)
             self._abort_if_unique_id_configured()
             session = async_get_clientsession(self.hass)
-            if not await _test_warning(session, self._office):
+            if not await _test_warning(session):
                 return self.async_abort(reason="cannot_connect")
             return await self.async_step_location()
         munis = list_municipalities(self._area, self._office)
