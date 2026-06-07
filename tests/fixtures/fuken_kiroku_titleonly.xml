@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Report xmlns="http://xml.kishou.go.jp/jmaxml1/" xmlns:jmx_ib="http://xml.kishou.go.jp/jmaxml1/informationBasis1/">
+  <Control><Title>府県気象情報</Title></Control>
+  <jmx_ib:Head>
+    <jmx_ib:Title>福岡県記録的短時間大雨情報</jmx_ib:Title>
+    <jmx_ib:ReportDateTime>2026-06-07T12:20:00+09:00</jmx_ib:ReportDateTime>
+    <jmx_ib:InfoType>発表</jmx_ib:InfoType>
+    <jmx_ib:Headline>
+      <jmx_ib:Text>朝倉市付近で猛烈な雨が降りました。</jmx_ib:Text>
+    </jmx_ib:Headline>
+  </jmx_ib:Head>
+</Report>

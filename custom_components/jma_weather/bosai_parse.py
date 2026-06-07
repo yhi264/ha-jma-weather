@@ -18,6 +18,15 @@ def _local(tag: str) -> str:
     return tag.rsplit("}", 1)[-1]
 
 
+def _find_head(root: Element) -> Element:
+    """Head 要素を返す（無ければ root）。Title 等が Control と Head の両方に出るため、
+    Head 配下に限定して探すのに使う。"""
+    for el in root.iter():
+        if _local(el.tag) == "Head":
+            return el
+    return root
+
+
 def _find_text(root: Element, localname: str) -> str:
     """最初に一致するローカル名要素のテキストを返す（深さ優先・全走査）。"""
     for el in root.iter():
@@ -81,7 +90,13 @@ def parse_doshakei(xml_text: str, class20_code: str) -> dict[str, Any]:
 def parse_tatsumaki(
     xml_text: str, office_code: str, now: dt.datetime
 ) -> dict[str, Any]:
-    """竜巻注意情報。発表かつ ValidDateTime 未経過なら active。"""
+    """竜巻注意情報。発表かつ ValidDateTime 未経過なら active。
+
+    office_code は API 互換のため受け取るが、対象地域の一致判定はフィード側の
+    ファイル名 office フィルタ（coordinator が当該 office の文書のみ取得）に委譲している。
+    安全側（誤検出による失効漏れ回避）を優先し、ここでは Area の追加絞り込みはしない。
+    将来 class10/class20 レベルの精緻化のためにパラメータを保持する。
+    """
     root = ET.fromstring(xml_text)
     info_type = _find_text(root, "InfoType")
     report_dt = _find_text(root, "ReportDateTime")
@@ -108,10 +123,11 @@ def parse_kirokuame(xml_text: str, now: dt.datetime) -> dict[str, Any]:
     取消電文が無いため ReportDateTime から KIROKU_AME_VALID_SEC 以内なら active。
     """
     root = ET.fromstring(xml_text)
-    info_type = _find_text(root, "InfoType")
-    title = _find_text(root, "Title")
-    headline = _find_text(root, "Text")
-    report_dt = _find_text(root, "ReportDateTime")
+    head = _find_head(root)
+    info_type = _find_text(head, "InfoType")
+    title = _find_text(head, "Title")
+    headline = _find_text(head, "Text")
+    report_dt = _find_text(head, "ReportDateTime")
     is_kiroku = ("記録的短時間大雨" in title) or ("記録的短時間大雨" in headline)
     rep = _parse_dt(report_dt)
     within = (

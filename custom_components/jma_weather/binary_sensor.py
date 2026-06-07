@@ -14,6 +14,17 @@ from .const import CONF_AREA_NAME, CONF_CLASS20, DOMAIN, PHENOMENA
 
 _LEVEL_RANK = {"特別警報": 3, "警報": 2, "注意報": 1}
 
+
+def _jma_device_info(entry: JmaConfigEntry) -> DeviceInfo:
+    """地点ごとの共通 DeviceInfo。"""
+    return DeviceInfo(
+        identifiers={(DOMAIN, entry.entry_id)},
+        name=f"JMA {entry.data[CONF_AREA_NAME]}",
+        manufacturer="気象庁",
+        model="気象警報・注意報",
+    )
+
+
 # 防災情報3種の定義: (group, 表示名, coordinator data キー)
 _BOSAI_SENSORS = [
     ("doshakei", "土砂災害警戒情報", "doshakei"),
@@ -46,13 +57,7 @@ class JmaPhenomenonBinarySensor(CoordinatorEntity, BinarySensorEntity):
         # 明示 entity_id（ASCII・安定・automation 参照しやすい）
         self.entity_id = f"binary_sensor.{DOMAIN}_{class20}_{group}"
         self._attr_entity_registry_enabled_default = phenomenon["enabled_default"]
-        area_name = entry.data[CONF_AREA_NAME]
-        self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, entry.entry_id)},
-            name=f"JMA {area_name}",
-            manufacturer="気象庁",
-            model="気象警報・注意報",
-        )
+        self._attr_device_info = _jma_device_info(entry)
 
     def _active(self) -> list[dict]:
         return [w for w in self.coordinator.data["warnings"] if w["code"] in self._codes]
@@ -84,13 +89,7 @@ class JmaBosaiBinarySensor(CoordinatorEntity, BinarySensorEntity):
         self._attr_name = name
         self._attr_unique_id = f"{entry.entry_id}_{group}"
         self.entity_id = f"binary_sensor.{DOMAIN}_{class20}_{group}"
-        area_name = entry.data[CONF_AREA_NAME]
-        self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, entry.entry_id)},
-            name=f"JMA {area_name}",
-            manufacturer="気象庁",
-            model="気象警報・注意報",
-        )
+        self._attr_device_info = _jma_device_info(entry)
 
     @property
     def is_on(self) -> bool:

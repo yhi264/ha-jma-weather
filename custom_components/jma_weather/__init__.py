@@ -47,7 +47,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: JmaConfigEntry) -> bool:
         class20_code=entry.data[CONF_CLASS20],
         scan_interval=scan_interval,
     )
-    await bosai.async_config_entry_first_refresh()
+    # bosai フィード(全国版・大)が一時的に落ちても 2a 警報センサーを巻き込まないよう、
+    # ブロッキングしない async_refresh を使う（失敗時は bosai センサーが unavailable で自己回復）。
+    await bosai.async_refresh()
 
     entry.runtime_data = JmaRuntimeData(warning=coordinator, bosai=bosai)
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)

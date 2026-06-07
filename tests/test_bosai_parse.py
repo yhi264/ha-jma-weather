@@ -62,3 +62,10 @@ def test_kirokuame_inactive_after_window():
     now = dt.datetime(2026, 6, 7, 14, 0, tzinfo=dt.timezone(dt.timedelta(hours=9)))
     r = parse_kirokuame(_load("fuken_kiroku.xml"), now=now)
     assert r["active"] is False
+
+
+def test_kirokuame_detected_by_head_title_only():
+    # 見出し本文に語が無くても Head/Title に「記録的短時間大雨」があれば検出
+    now = dt.datetime(2026, 6, 7, 12, 40, tzinfo=dt.timezone(dt.timedelta(hours=9)))
+    r = parse_kirokuame(_load("fuken_kiroku_titleonly.xml"), now=now)
+    assert r["active"] is True
