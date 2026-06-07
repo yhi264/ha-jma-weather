@@ -16,9 +16,9 @@ async def fetch_area(session: aiohttp.ClientSession) -> dict[str, Any]:
 
 
 def list_offices(area: dict[str, Any]) -> list[tuple[str, str]]:
-    """(office_code, name) のリストを名称順で返す。"""
+    """(office_code, name) のリストをコード順（全国地方公共団体コード順＝北→南）で返す。"""
     offices = area.get("offices", {})
-    return sorted(((code, o["name"]) for code, o in offices.items()), key=lambda x: x[1])
+    return sorted(((code, o["name"]) for code, o in offices.items()), key=lambda x: x[0])
 
 
 def list_municipalities(area: dict[str, Any], office_code: str) -> list[tuple[str, str]]:
@@ -33,7 +33,8 @@ def list_municipalities(area: dict[str, Any], office_code: str) -> list[tuple[st
             for c20 in class15s.get(c15, {}).get("children", []):
                 name = class20s.get(c20, {}).get("name", c20)
                 result.append((c20, name))
-    return sorted(result, key=lambda x: x[1])
+    # コード順（市町村コード順＝政令市・市・郡部の標準行政順）で返す
+    return sorted(result, key=lambda x: x[0])
 
 
 def resolve_class10(area: dict[str, Any], class20_code: str) -> str | None:
