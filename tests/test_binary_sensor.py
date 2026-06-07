@@ -54,7 +54,9 @@ async def test_kaminari_on(hass):
     assert ooame.state == "off"
 
 
-async def test_minor_phenomena_disabled_by_default(hass):
+async def test_all_phenomena_enabled_by_default(hass):
     await _setup(hass)
-    # 乾燥(kansou)は enabled_default=False → state 取得不可（登録のみ・無効）
-    assert hass.states.get("binary_sensor.jma_weather_4044700_kansou") is None
+    # 全種別が既定で有効。乾燥(kansou)等のニッチ種別もエンティティが存在する
+    assert hass.states.get("binary_sensor.jma_weather_4044700_kansou") is not None
+    assert hass.states.get("binary_sensor.jma_weather_4044700_shimo") is not None
+    assert hass.states.get("binary_sensor.jma_weather_4044700_nadare") is not None

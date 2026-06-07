@@ -59,7 +59,7 @@ Options (changeable later): **update interval** in seconds (default `300` = 5 mi
   - Attributes: `level` (Emergency Warning / Warning / Advisory), `status`. A single phenomenon spans advisory→warning→emergency levels; `level` reflects the highest active one.
   - Example: `binary_sensor.jma_weather_4044700_kaminari`
 
-#### Enabled by default
+#### Phenomena (all enabled by default — disable any you don't need in the entity settings)
 
 | group | Phenomenon | JMA codes |
 |---|---|---|
@@ -74,10 +74,14 @@ Options (changeable later): **update interval** in seconds (default `300` = 5 mi
 | `kyoufuu` | Strong wind / 強風 | 15 |
 | `noumu` | Dense fog / 濃霧 | 20 |
 | `tokubetsu` | Emergency Warning (any) / 特別警報 | 32 / 33 / 35 / 36 / 37 / 38 |
-
-#### Disabled by default (enable in the entity settings as needed)
-
-`fuusetsu` (snow & wind / 風雪), `kansou` (dry air / 乾燥), `nadare` (avalanche / なだれ), `teion` (low temperature / 低温), `shimo` (frost / 霜), `chakuhyou` (icing / 着氷), `chakusetsu` (snow accretion / 着雪), `yuusetsu` (snowmelt / 融雪)
+| `fuusetsu` | Snow & wind / 風雪 | 13 |
+| `kansou` | Dry air / 乾燥 | 21 |
+| `nadare` | Avalanche / なだれ | 22 |
+| `teion` | Low temperature / 低温 | 23 |
+| `shimo` | Frost / 霜 | 24 |
+| `chakuhyou` | Icing / 着氷 | 25 |
+| `chakusetsu` | Snow accretion / 着雪 | 26 |
+| `yuusetsu` | Snowmelt / 融雪 | 17 |
 
 #### Disaster-prevention info (Phase 2b, enabled by default)
 

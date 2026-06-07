@@ -21,11 +21,9 @@ def test_code_info_unknown():
     assert group == "unknown"
 
 
-def test_phenomena_default_flags():
-    kaminari = next(p for p in PHENOMENA if p["group"] == "kaminari")
-    assert kaminari["enabled_default"] is True
-    kansou = next(p for p in PHENOMENA if p["group"] == "kansou")
-    assert kansou["enabled_default"] is False
+def test_all_phenomena_enabled_by_default():
+    # 全現象を既定で有効化（不要なものは HA のエンティティ設定で個別 OFF）
+    assert all(p["enabled_default"] is True for p in PHENOMENA)
 
 
 def test_special_phenomenon_aggregates_special_codes():

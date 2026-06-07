@@ -59,7 +59,7 @@
   - 属性: `level`（特別警報／警報／注意報）、`status`（発表／継続／なし）。1 現象が注意報〜特別警報の複数レベルを束ね、`level` に最上位を表示
   - 例: `binary_sensor.jma_weather_4044700_kaminari`
 
-#### 既定で有効な現象（group）
+#### 現象一覧（すべて既定で有効・不要なものは HA のエンティティ設定で個別 OFF）
 
 | group | 現象 | JMA コード |
 |---|---|---|
@@ -74,10 +74,14 @@
 | `kyoufuu` | 強風 | 15 |
 | `noumu` | 濃霧 | 20 |
 | `tokubetsu` | 特別警報（いずれか）集約 | 32 / 33 / 35 / 36 / 37 / 38 |
-
-#### 既定で無効な現象（必要なら HA のエンティティ設定で有効化）
-
-`fuusetsu`（風雪）/ `kansou`（乾燥）/ `nadare`（なだれ）/ `teion`（低温）/ `shimo`（霜）/ `chakuhyou`（着氷）/ `chakusetsu`（着雪）/ `yuusetsu`（融雪）
+| `fuusetsu` | 風雪 | 13 |
+| `kansou` | 乾燥 | 21 |
+| `nadare` | なだれ | 22 |
+| `teion` | 低温 | 23 |
+| `shimo` | 霜 | 24 |
+| `chakuhyou` | 着氷 | 25 |
+| `chakusetsu` | 着雪 | 26 |
+| `yuusetsu` | 融雪 | 17 |
 
 #### 防災気象情報（Phase 2b・既定で有効）
 

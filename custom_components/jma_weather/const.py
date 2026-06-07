@@ -76,15 +76,15 @@ PHENOMENA: list[dict] = [
     {"group": "kyoufuu", "name": "強風", "codes": ["15"], "enabled_default": True},
     {"group": "noumu", "name": "濃霧", "codes": ["20"], "enabled_default": True},
     {"group": "tokubetsu", "name": "特別警報", "codes": ["32", "33", "35", "36", "37", "38"], "enabled_default": True},
-    # 既定無効（雑然回避・必要なら options で有効化）
-    {"group": "fuusetsu", "name": "風雪", "codes": ["13"], "enabled_default": False},
-    {"group": "kansou", "name": "乾燥", "codes": ["21"], "enabled_default": False},
-    {"group": "nadare", "name": "なだれ", "codes": ["22"], "enabled_default": False},
-    {"group": "teion", "name": "低温", "codes": ["23"], "enabled_default": False},
-    {"group": "shimo", "name": "霜", "codes": ["24"], "enabled_default": False},
-    {"group": "chakuhyou", "name": "着氷", "codes": ["25"], "enabled_default": False},
-    {"group": "chakusetsu", "name": "着雪", "codes": ["26"], "enabled_default": False},
-    {"group": "yuusetsu", "name": "融雪", "codes": ["17"], "enabled_default": False},
+    # 全種別を既定で有効（不要なものは HA のエンティティ設定で個別に無効化可能）
+    {"group": "fuusetsu", "name": "風雪", "codes": ["13"], "enabled_default": True},
+    {"group": "kansou", "name": "乾燥", "codes": ["21"], "enabled_default": True},
+    {"group": "nadare", "name": "なだれ", "codes": ["22"], "enabled_default": True},
+    {"group": "teion", "name": "低温", "codes": ["23"], "enabled_default": True},
+    {"group": "shimo", "name": "霜", "codes": ["24"], "enabled_default": True},
+    {"group": "chakuhyou", "name": "着氷", "codes": ["25"], "enabled_default": True},
+    {"group": "chakusetsu", "name": "着雪", "codes": ["26"], "enabled_default": True},
+    {"group": "yuusetsu", "name": "融雪", "codes": ["17"], "enabled_default": True},
 ]
 
 # --- Phase 2b: 防災気象情報 ---
