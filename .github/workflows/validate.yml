@@ -7,10 +7,9 @@ on:
     - cron: "0 0 * * *"
   workflow_dispatch:
 
-# NOTE: 最小権限 permissions:{contents:read} を入れると、private リポジトリでは
-# hacs/action が GitHub API 経由で hacs.json/manifest.json を取得できず誤判定する。
-# public 化後に `permissions: contents: read` を追加してサプライチェーンを締める想定。
-# 代替の恒久ハードニングとして各 action の SHA ピン留めも検討可（README/ロードマップ参照）。
+# 最小権限（サプライチェーン対策）: 検証のみで書き込み不要。
+permissions:
+  contents: read
 
 jobs:
   hassfest:
@@ -23,11 +22,15 @@ jobs:
   hacs:
     name: HACS
     runs-on: ubuntu-latest
+    # NOTE: hacs/action は GitHub API 経由で hacs.json/manifest.json を取得するため、
+    # private リポジトリでは取得不可（Got None）で誤判定する。HACS 検証は public 前提。
+    # public 化までは非ブロッキングにし、公開時に continue-on-error を外して必須化する。
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - uses: hacs/action@main
         with:
           category: integration
-          # brands は home-assistant/brands 登録が必要でデフォルトストア用要件。
-          # カスタムリポジトリ導入には不要なため CI では無視（公開時に対応）。
+          # brands は home-assistant/brands 登録が必要（デフォルトストア要件）。
+          # カスタムリポジトリ導入には不要なため無視。公開時に brands 登録で対応。
           ignore: brands
