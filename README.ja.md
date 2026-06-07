@@ -7,7 +7,7 @@
 
 気象庁（JMA）の防災情報から、日本国内の任意の市町村の**気象警報・注意報・特別警報**を取得する [Home Assistant](https://www.home-assistant.io/) カスタムインテグレーションです。
 
-公式オープンデータ（`warning/data/warning/{office}.json`）をポーリングし、地点ごとに「発表中の件数」を表す集約センサーと、現象ごと（雷・大雨・洪水…）の `binary_sensor` を提供します。
+公式の防災情報XML（R06 集約通報 VPWS50）をポーリングし、地点ごとに「発表中の件数」を表す集約センサーと、現象ごと（雷・大雨・洪水…）の `binary_sensor` を提供します。
 
 > **ステータス：Phase 2b（警報・注意報＋防災気象情報）。** 天気予報・降水ナウキャストは下記ロードマップ参照。
 
@@ -50,13 +50,13 @@
 ### 集約センサー
 
 - **`sensor.jma_weather_<class20>_warnings`** — 発表中の警報・注意報の**件数**（int）
-  - 属性: `summary`（例「雷注意報・大雨警報」/「なし」）、`warnings`（`{code, name, level, status}` のリスト）、`has_special_warning`、`report_datetime`、`area_name`
+  - 属性: `summary`（例「雷注意報・大雨警報」/「なし」）、`warnings`（`{code, name, level, status}` のリスト — `level` は各警報・注意報の警戒レベル、なければ null）、`max_level`（発表中の最大警戒レベル、なければ null）、`has_special_warning`、`report_datetime`、`area_name`
   - 例: `sensor.jma_weather_4044700_warnings`
 
 ### 現象ごと binary_sensor
 
 - **`binary_sensor.jma_weather_<class20>_<group>`** — その現象が**発表中または継続中**なら `on`（`device_class: safety`）
-  - 属性: `level`（特別警報／警報／注意報）、`status`（発表／継続／なし）。1 現象が注意報〜特別警報の複数レベルを束ね、`level` に最上位を表示
+  - 属性: `level`（警報・注意報の警戒レベル、なければ null）、`status`（発表／継続／なし）。1 現象が注意報〜特別警報の複数レベルを束ね、`level` に最上位を表示
   - 例: `binary_sensor.jma_weather_4044700_kaminari`
 
 #### 現象一覧（すべて既定で有効・不要なものは HA のエンティティ設定で個別 OFF）
@@ -82,6 +82,8 @@
 | `chakuhyou` | 着氷 | 25 |
 | `chakusetsu` | 着雪 | 26 |
 | `yuusetsu` | 融雪 | 17 |
+
+> **注:** R06 形式では洪水警報・注意報は指定河川洪水予報（VXKO）で別配信されるため、本警報フィードには含まれません。`kozui` センサーは現状データ源を持たず off のままです（将来対応予定）。
 
 #### 防災気象情報（Phase 2b・既定で有効）
 

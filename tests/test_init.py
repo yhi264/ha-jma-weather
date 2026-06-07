@@ -1,5 +1,3 @@
-import json
-import pathlib
 from unittest.mock import patch
 
 from homeassistant.config_entries import ConfigEntryState
@@ -9,11 +7,8 @@ from custom_components.jma_weather.const import (
     DOMAIN, CONF_OFFICE, CONF_CLASS20, CONF_CLASS10, CONF_AREA_NAME,
 )
 
-FIX = pathlib.Path(__file__).parent / "fixtures"
-
 
 async def test_setup_and_unload(hass):
-    payload = json.loads((FIX / "warning_multi.json").read_text(encoding="utf-8"))
     entry = MockConfigEntry(
         domain=DOMAIN,
         title="JMA 筑前町",

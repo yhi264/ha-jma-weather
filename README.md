@@ -7,7 +7,7 @@
 
 A [Home Assistant](https://www.home-assistant.io/) custom integration that exposes **weather warnings, advisories, and emergency warnings** issued by the **Japan Meteorological Agency (JMA / 気象庁)** for any municipality in Japan.
 
-It polls the official JMA open data (`warning/data/warning/{office}.json`) and creates, per location, an aggregate sensor (number of active warnings) plus one `binary_sensor` per phenomenon (thunderstorm, heavy rain, flood, …).
+It polls the official JMA disaster-prevention XML (R06 集約通報, VPWS50) and creates, per location, an aggregate sensor (number of active warnings) plus one `binary_sensor` per phenomenon (thunderstorm, heavy rain, flood, …).
 
 > **Status: Phase 2b (warnings/advisories + disaster-prevention info).** Weather forecast and precipitation nowcast are on the roadmap below.
 
@@ -50,13 +50,13 @@ Options (changeable later): **update interval** in seconds (default `300` = 5 mi
 ### Aggregate sensor
 
 - **`sensor.jma_weather_<class20>_warnings`** — number of active warnings/advisories (int)
-  - Attributes: `summary` (e.g. `雷注意報・大雨警報` / `なし`), `warnings` (list of `{code, name, level, status}`), `has_special_warning`, `report_datetime`, `area_name`
+  - Attributes: `summary` (e.g. `雷注意報・大雨警報` / `なし`), `warnings` (list of `{code, name, level, status}` — `level` is the warning's 警戒レベル or null), `max_level` (highest active 警戒レベル, or null if none), `has_special_warning`, `report_datetime`, `area_name`
   - Example: `sensor.jma_weather_4044700_warnings`
 
 ### Per-phenomenon binary sensors
 
 - **`binary_sensor.jma_weather_<class20>_<group>`** — `on` while that phenomenon is **issued (発表) or continuing (継続)** (`device_class: safety`)
-  - Attributes: `level` (Emergency Warning / Warning / Advisory), `status`. A single phenomenon spans advisory→warning→emergency levels; `level` reflects the highest active one.
+  - Attributes: `level` (the warning's 警戒レベル, or null), `status`. A single phenomenon spans advisory→warning→emergency levels; `level` reflects the highest active one.
   - Example: `binary_sensor.jma_weather_4044700_kaminari`
 
 #### Phenomena (all enabled by default — disable any you don't need in the entity settings)
@@ -82,6 +82,8 @@ Options (changeable later): **update interval** in seconds (default `300` = 5 mi
 | `chakuhyou` | Icing / 着氷 | 25 |
 | `chakusetsu` | Snow accretion / 着雪 | 26 |
 | `yuusetsu` | Snowmelt / 融雪 | 17 |
+
+> **Note:** In the R06 format, flood (洪水) warnings are distributed via the 指定河川洪水予報 (VXKO) product, not this warning feed; the `kozui` sensor currently has no data source and remains off (planned for a future release).
 
 #### Disaster-prevention info (Phase 2b, enabled by default)
 

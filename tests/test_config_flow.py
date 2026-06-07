@@ -8,7 +8,6 @@ from custom_components.jma_weather.const import DOMAIN, CONF_OFFICE, CONF_CLASS2
 
 FIX = pathlib.Path(__file__).parent / "fixtures"
 AREA = json.loads((FIX / "area_min.json").read_text(encoding="utf-8"))
-WARN = json.loads((FIX / "warning_multi.json").read_text(encoding="utf-8"))
 
 
 async def test_full_flow(hass):

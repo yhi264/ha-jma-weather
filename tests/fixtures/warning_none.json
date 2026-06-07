@@ -1,8 +1,0 @@
-{
-  "reportDatetime": "2026-05-28T11:31:00+09:00",
-  "publishingOffice": "福岡管区気象台",
-  "areaTypes": [
-    {"areas": [{"code": "400010", "warnings": [{"status": "発表"}]}]},
-    {"areas": [{"code": "4044700", "warnings": [{"status": "発表警報・注意報はなし"}]}]}
-  ]
-}
