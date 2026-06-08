@@ -131,8 +131,6 @@ python3 -m venv .venv
 ./.venv/bin/pytest tests/ -q
 ```
 
-Design documents live under `docs/superpowers/` (spec & implementation plan).
-
 ## License
 
 MIT License © 2026 yhi264

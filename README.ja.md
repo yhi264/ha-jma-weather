@@ -131,8 +131,6 @@ python3 -m venv .venv
 ./.venv/bin/pytest tests/ -q
 ```
 
-設計ドキュメントは `docs/superpowers/` 配下（spec / 実装計画）。
-
 ## ライセンス
 
 MIT License © 2026 yhi264
