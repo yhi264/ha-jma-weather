@@ -2,6 +2,7 @@
 
 [English](README.md) | **日本語**
 
+[![Tests](https://github.com/yhi264/ha-jma-weather/actions/workflows/tests.yml/badge.svg)](https://github.com/yhi264/ha-jma-weather/actions/workflows/tests.yml)
 [![HACS Custom](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://hacs.xyz/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
